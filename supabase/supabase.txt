@@ -1,0 +1,3 @@
+https://jhhogeuvvtrwegcdijut.supabase.co/auth/v1/callback
+jhhogeuvvtrwegcdijut.apps.googleusercontent.com
+jhhogeuvvtrwegcdijut-123456
