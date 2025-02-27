@@ -69,7 +69,7 @@ class WordListRoute extends PageRouteInfo<void> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return WordListScreen();
+      return const WordListScreen();
     },
   );
 }

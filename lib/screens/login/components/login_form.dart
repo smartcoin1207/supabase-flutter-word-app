@@ -35,7 +35,7 @@ class _LoginFormState extends State<LoginForm> {
         await supabaseService.login(
             emailController.text.trim(), passwordController.text.trim());
 
-        context.router.replace(const HomeRoute());
+        context.router.replace(const WordListRoute());
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login failed: $error')),

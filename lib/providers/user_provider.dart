@@ -37,9 +37,9 @@ class UserNotifier extends StateNotifier<UserModel?> {
 
     final res = await supabase.auth.getUser();
 
-    final userId = res.user!.id;
-    final userEmail = res.user!.email ?? "No email";
-    final userName = res.user!.userMetadata?['full_name'] ?? "Unknown";
+    final userId = res.user?.id ?? '';
+    final userEmail = res.user?.email ?? '';
+    final userName = res.user?.userMetadata?['full_name'] ?? '';
 
     state = UserModel(id: userId, email: userEmail, name: userName);
   }

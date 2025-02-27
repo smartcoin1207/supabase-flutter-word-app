@@ -39,7 +39,7 @@ class _LoginFormState extends State<LoginFormOauth> {
 
         if (response.user != null) {
           // Successfully signed in
-          context.router.replace(const HomeRoute());
+          context.router.replace(const WordListRoute());
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Sign-In failed!')),

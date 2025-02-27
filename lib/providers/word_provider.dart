@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_word_app/models/word_model.dart';
 import 'package:supabase_word_app/providers/user_provider.dart';
@@ -64,7 +65,7 @@ class WordNotifier extends StateNotifier<List<WordModel>> {
             table: 'words',
             callback: (payload) {
               state = state
-                  .where((word) => word.id != payload.oldRecord['id'] as String)
+                  .where((word) => word.id != payload.oldRecord['id'] as int)
                   .toList(); // Remove deleted word
             })
         .subscribe(); // Begin subscription to real-time changes
@@ -87,26 +88,31 @@ class WordNotifier extends StateNotifier<List<WordModel>> {
         .select()
         .single();
 
-    // Add the new word to the state
-    state = [
-      ...state,
-      WordModel(
-        id: response['id'] as int,
-        word: response['word'] as String,
-        user_id: response['user_id'] as String,
-      )
-    ];
+    // Fetch the total count of words for the authenticated user
+    final countResponse =
+        await supabase.from('words').select('id').eq('user_id', user.id);
+
+    int wordCount = countResponse.length;
+
+    // Check if the word count matches the predefined milestones
+    if ([5, 12, 17, 21, 25].contains(wordCount)) {
+      Fluttertoast.showToast(
+        msg: "You have $wordCount words!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
+    }
   }
 
   // Delete word only for the authenticated user
-  Future<void> deleteWord(String word) async {
+  Future<void> deleteWord(int id) async {
     final user = ref.read(userProvider);
     if (user == null) return;
 
     await supabase
         .from('words')
         .delete()
-        .eq('word', word)
+        .eq('id', id)
         .eq('user_id', user.id); // Ensure only user's words are deleted
 
     fetchWordsAll(); // Refresh list after deletion

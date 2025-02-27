@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (session != null) {
-            _appRouter.replace(HomeRoute());
+            _appRouter.replace(WordListRoute());
           } else {
             _appRouter.replace(LoginRoute());
           }

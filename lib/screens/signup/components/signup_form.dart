@@ -42,7 +42,7 @@ class _SignUpFormState extends State<SignUpForm> {
           );
 
           // Navigate to Home Screen after successful signup
-          context.router.replace(const HomeRoute());
+          context.router.replace(const WordListRoute());
         }
       } catch (error) {
         if (context.mounted) {
