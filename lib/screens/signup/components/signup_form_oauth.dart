@@ -1,38 +1,16 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:sign_in_button/sign_in_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../../home_screen.dart';
+import 'package:supabase_word_app/app_router.dart';
+import '../../../constants/constants.dart';
 
-class SignUpFormProvider extends StatelessWidget {
-  const SignUpFormProvider({super.key});
-
-  Future<void> _signInWithProvider(
-      BuildContext context, OAuthProvider provider) async {
-    try {
-      final bool res =
-          await Supabase.instance.client.auth.signInWithOAuth(provider);
-
-      if (res) {
-        // User signed in successfully
-        Navigator.pushReplacementNamed(
-            context, '/home'); // Redirect to home screen
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: User not found')),
-        );
-      }
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $error')),
-      );
-    }
-  }
+class SignUpFormOauth extends StatelessWidget {
+  const SignUpFormOauth({super.key});
 
   Future<void> _googleSignIn(BuildContext context) async {
-    const webClientId =
-        '615079494788-4a3g13pp9vh6h3nkvncjurups7irph3r.apps.googleusercontent.com';
+    final webClientId = googleClientId;
 
     // Initialize Google Sign-In
     final GoogleSignIn googleSignIn = GoogleSignIn(
@@ -59,10 +37,7 @@ class SignUpFormProvider extends StatelessWidget {
 
       // If sign-in is successful, navigate to Home screen
       if (authResponse.user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+        context.router.replace(const HomeRoute());
       } else {
         // Handle error if user is null
         ScaffoldMessenger.of(context).showSnackBar(
@@ -99,7 +74,7 @@ class SignUpFormProvider extends StatelessWidget {
 
         // Facebook Button
         GestureDetector(
-          onTap: () => _signInWithProvider(context, OAuthProvider.facebook),
+          onTap: () => {},
           child: CircleAvatar(
             radius: 20,
             backgroundColor: Colors.white,
@@ -114,7 +89,7 @@ class SignUpFormProvider extends StatelessWidget {
 
         // Apple Button
         GestureDetector(
-          onTap: () => _signInWithProvider(context, OAuthProvider.apple),
+          onTap: () => {},
           child: CircleAvatar(
             radius: 20,
             backgroundColor: Colors.white,

@@ -1,9 +1,11 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import 'package:supabase_word_app/constants.dart';
-import 'package:supabase_word_app/responsive.dart';
+import '../../constants/constants.dart';
+import '../../utils/responsive.dart';
 import 'components/signup_form.dart';
 
+@RoutePage()
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 

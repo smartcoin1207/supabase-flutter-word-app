@@ -1,7 +1,9 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_word_app/responsive.dart';
+import '../../utils/responsive.dart';
 import './components/login_form.dart';
 
+@RoutePage()
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
 

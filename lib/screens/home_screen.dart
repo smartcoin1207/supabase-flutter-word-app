@@ -1,52 +1,25 @@
 import 'package:flutter/material.dart';
-import '../services/supabase_service.dart';
-import './login/login_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_word_app/app_router.dart';
+import '../providers/user_provider.dart';
 
-class HomeScreen extends StatefulWidget {
+@RoutePage()
+class HomeScreen extends ConsumerWidget {
   @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider); // Get user data from provider
 
-class _HomeScreenState extends State<HomeScreen> {
-  final SupabaseService supabaseService = SupabaseService();
-  final supabase = Supabase.instance.client;
-  String? displayName;
-  String? email;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
-
-  Future<void> handleLogout(BuildContext context) async {
-    await supabaseService.logout();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
-  }
-
-  Future<void> _loadUserData() async {
-    final user = supabase.auth.currentUser;
-    if (user != null) {
-      setState(() {
-        email = user.email;
-        displayName = user.userMetadata?['full_name']; // Google name
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home"),
+        title: const Text("Home"),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () => handleLogout(context),
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              ref.read(userProvider.notifier).logout();
+              context.router.replace(const LoginRoute());
+            },
           ),
         ],
       ),
@@ -54,9 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Name: ${displayName ?? 'Unknown'}"),
-            Text("Email: ${email ?? 'Unknown'}"),
-            SizedBox(height: 20),
+            Text("Name: ${user?.name}"),
+            Text("Email: ${user?.email}"),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => {context.router.replace(const WordListRoute())},
+              child: Text("Word".toUpperCase()),
+            ),
           ],
         ),
       ),

@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'screens/login/login_screen.dart';
-import 'screens/home_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_word_app/app_router.dart';
 import 'services/supabase_service.dart';
+import 'constants/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-    url: 'https://jhhogeuvvtrwegcdijut.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoaG9nZXV2dnRyd2VnY2RpanV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA1Njk4OTAsImV4cCI6MjA1NjE0NTg5MH0.L0_E2EVfYU45xBAexNOJyr8ifJ7tyMT2x_AenlI7rCc',
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
-  runApp(const MyApp());
+  await dotenv.load();
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -25,6 +28,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final SupabaseService supabaseService = SupabaseService();
   late Stream<AuthState> authStateStream;
+  final _appRouter = AppRouter();
 
   @override
   void initState() {
@@ -43,9 +47,18 @@ class _MyAppState extends State<MyApp> {
         }
 
         final session = Supabase.instance.client.auth.currentSession;
-        return MaterialApp(
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (session != null) {
+            _appRouter.replace(HomeRoute());
+          } else {
+            _appRouter.replace(LoginRoute());
+          }
+        });
+
+        return MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          home: session != null ? HomeScreen() : LoginScreen(),
+          routerConfig: _appRouter.config(),
         );
       },
     );

@@ -1,9 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_word_app/app_router.dart';
 import '../../../components/already_have_an_account_acheck.dart';
-import '../../../constants.dart';
+import '../../../constants/constants.dart';
 import '../../../services/supabase_service.dart';
-import '../../login/login_screen.dart';
-import 'signup_form_provider.dart'; // Import provider signup buttons
+import 'signup_form_oauth.dart'; // Import provider signup buttons
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -30,7 +31,6 @@ class _SignUpFormState extends State<SignUpForm> {
 
   Future<void> handleSignup(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      // Validate form before signing up
       try {
         await supabaseService.signUp(
           emailController.text.trim(),
@@ -40,10 +40,9 @@ class _SignUpFormState extends State<SignUpForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Signup successful. Please log in.')),
           );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-          );
+
+          // Navigate to Home Screen after successful signup
+          context.router.replace(const HomeRoute());
         }
       } catch (error) {
         if (context.mounted) {
@@ -138,14 +137,7 @@ class _SignUpFormState extends State<SignUpForm> {
               AlreadyHaveAnAccountCheck(
                 login: false,
                 press: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const LoginScreen();
-                      },
-                    ),
-                  );
+                  context.router.replace(const LoginRoute());
                 },
               ),
             ],
@@ -154,7 +146,7 @@ class _SignUpFormState extends State<SignUpForm> {
         const SizedBox(height: 20),
 
         // Add social login buttons at the bottom
-        const SignUpFormProvider(),
+        const SignUpFormOauth(),
       ],
     );
   }
