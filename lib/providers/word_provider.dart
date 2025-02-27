@@ -98,8 +98,8 @@ class WordNotifier extends StateNotifier<List<WordModel>> {
     if ([5, 12, 17, 21, 25].contains(wordCount)) {
       Fluttertoast.showToast(
         msg: "You have $wordCount words!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
       );
     }
   }
