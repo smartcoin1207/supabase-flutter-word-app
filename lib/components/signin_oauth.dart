@@ -1,53 +1,24 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_word_app/app_router.dart';
-import '../../../constants/constants.dart';
+import 'package:supabase_word_app/services/supabase_service.dart';
 
-class LoginFormOauth extends StatefulWidget {
-  const LoginFormOauth({super.key});
+class SignInOauth extends StatefulWidget {
+  const SignInOauth({super.key});
 
   @override
-  State<LoginFormOauth> createState() => _LoginFormState();
+  State<SignInOauth> createState() => _SignInOauthState();
 }
 
-class _LoginFormState extends State<LoginFormOauth> {
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    serverClientId: googleClientId,
-  );
+class _SignInOauthState extends State<SignInOauth> {
+  final SupabaseService supabaseService = SupabaseService();
 
-  Future<void> _googleSignInFunction() async {
+  Future<void> _googleSignInFunction(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        // If the user cancels the sign-in
-        return;
-      }
-
-      // Authenticate with Supabase using Google ID Token
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final String? idToken = googleAuth.idToken;
-
-      if (idToken != null) {
-        final response = await Supabase.instance.client.auth.signInWithIdToken(
-          provider: OAuthProvider.google,
-          idToken: idToken,
-        );
-
-        if (response.user != null) {
-          // Successfully signed in
-          context.router.replace(const WordListRoute());
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign-In failed!')),
-          );
-        }
-      }
+      await supabaseService.googleSignInFunction();
+      context.router.replace(const WordListRoute());
     } catch (error) {
-      print('Error during Google sign-in: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $error')),
       );
@@ -61,7 +32,7 @@ class _LoginFormState extends State<LoginFormOauth> {
       children: [
         // Google Button
         GestureDetector(
-          onTap: () => _googleSignInFunction(),
+          onTap: () => _googleSignInFunction(context),
           child: CircleAvatar(
             radius: 20, // Adjust the size of the button
             backgroundColor: Colors.white,

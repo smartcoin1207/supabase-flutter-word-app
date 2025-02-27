@@ -8,12 +8,12 @@ import 'constants/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
   );
-
-  await dotenv.load();
 
   runApp(const ProviderScope(child: MyApp()));
 }

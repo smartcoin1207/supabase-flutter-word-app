@@ -1,10 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_word_app/app_router.dart';
+import 'package:supabase_word_app/components/signin_oauth.dart';
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants/constants.dart';
 import '../../../services/supabase_service.dart';
-import 'signup_form_oauth.dart'; // Import provider signup buttons
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -146,7 +146,7 @@ class _SignUpFormState extends State<SignUpForm> {
         const SizedBox(height: 20),
 
         // Add social login buttons at the bottom
-        const SignUpFormOauth(),
+        const SignInOauth(),
       ],
     );
   }

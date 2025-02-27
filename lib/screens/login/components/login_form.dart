@@ -1,9 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_word_app/app_router.dart';
-import 'package:supabase_word_app/screens/login/components/login_form_oauth.dart';
+import 'package:supabase_word_app/components/signin_oauth.dart';
 import 'package:supabase_word_app/utils/validators.dart';
-
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants/constants.dart';
 import '../../../services/supabase_service.dart';
@@ -118,7 +117,7 @@ class _LoginFormState extends State<LoginForm> {
       const SizedBox(height: 20),
 
       // Add social login buttons at the bottom
-      const LoginFormOauth(),
+      const SignInOauth(),
     ]);
   }
 }

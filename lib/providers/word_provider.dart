@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_word_app/models/user_model.dart';
 import 'package:supabase_word_app/models/word_model.dart';
 import 'package:supabase_word_app/providers/user_provider.dart';
 
@@ -13,6 +14,7 @@ class WordNotifier extends StateNotifier<List<WordModel>> {
   }
 
   final Ref ref;
+  UserModel? get user => ref.read(userProvider);
 
   // Fetch all words for all users (not filtered by user_id)
   Future<void> fetchWordsAll() async {
@@ -34,22 +36,26 @@ class WordNotifier extends StateNotifier<List<WordModel>> {
     supabase
         .channel('public:words')
         .onPostgresChanges(
-            event: PostgresChangeEvent.insert,
-            schema: 'public',
-            table: 'words',
-            callback: (payload) {
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'words',
+          callback: (payload) {
+            if (user?.id != payload.newRecord['user_id'] as String) {
               final newWord = WordModel(
                 id: payload.newRecord['id'] as int,
                 word: payload.newRecord['word'] as String,
                 user_id: payload.newRecord['user_id'] as String,
               );
               state = [...state, newWord]; // Add the new word to the state
-            })
+            }
+          },
+        )
         .onPostgresChanges(
-            event: PostgresChangeEvent.update,
-            schema: 'public',
-            table: 'words',
-            callback: (payload) {
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'words',
+          callback: (payload) {
+            if (user?.id != payload.newRecord['user_id'] as String) {
               final updatedWord = WordModel(
                 id: payload.newRecord['id'] as int,
                 word: payload.newRecord['word'] as String,
@@ -58,16 +64,19 @@ class WordNotifier extends StateNotifier<List<WordModel>> {
               state = state
                   .map((word) => word.id == updatedWord.id ? updatedWord : word)
                   .toList(); // Update the word
-            })
+            }
+          },
+        )
         .onPostgresChanges(
-            event: PostgresChangeEvent.delete,
-            schema: 'public',
-            table: 'words',
-            callback: (payload) {
-              state = state
-                  .where((word) => word.id != payload.oldRecord['id'] as int)
-                  .toList(); // Remove deleted word
-            })
+          event: PostgresChangeEvent.delete,
+          schema: 'public',
+          table: 'words',
+          callback: (payload) {
+            state = state
+                .where((word) => word.id != payload.oldRecord['id'] as int)
+                .toList(); // Remove deleted word
+          },
+        )
         .subscribe(); // Begin subscription to real-time changes
   }
 
@@ -87,7 +96,14 @@ class WordNotifier extends StateNotifier<List<WordModel>> {
         })
         .select()
         .single();
-
+    state = [
+      ...state,
+      WordModel(
+        id: response['id'] as int,
+        word: response['word'] as String,
+        user_id: response['user_id'] as String,
+      )
+    ];
     // Fetch the total count of words for the authenticated user
     final countResponse =
         await supabase.from('words').select('id').eq('user_id', user.id);
@@ -98,8 +114,8 @@ class WordNotifier extends StateNotifier<List<WordModel>> {
     if ([5, 12, 17, 21, 25].contains(wordCount)) {
       Fluttertoast.showToast(
         msg: "You have $wordCount words!",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
       );
     }
   }
