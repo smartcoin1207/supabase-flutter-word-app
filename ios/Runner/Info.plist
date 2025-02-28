@@ -52,7 +52,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>$(GOOGLE_API_CLIENT_ID)</string>
+				<string>$(GOOGLE_API_CLIENT_ID_URL_SCHEME)</string>
 			</array>
 		</dict>
 	</array>
