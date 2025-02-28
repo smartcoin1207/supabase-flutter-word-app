@@ -16,8 +16,14 @@ class _SignInOauthState extends State<SignInOauth> {
 
   Future<void> _googleSignInFunction(BuildContext context) async {
     try {
-      await supabaseService.googleSignInFunction();
-      context.router.replace(const WordListRoute());
+      bool isSignedIn = await supabaseService.googleSignInFunction();
+      if (isSignedIn) {
+        context.router.replace(const WordListRoute());
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign-In failed!')),
+        );
+      }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $error')),
