@@ -1,44 +1,45 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:supabase_word_app/app_router.dart';
+import 'package:supabase_word_app/providers/loading_provider.dart';
 import 'package:supabase_word_app/services/supabase_service.dart';
 
-class SignInOauth extends StatefulWidget {
+class SignInOauth extends ConsumerWidget {
   const SignInOauth({super.key});
 
   @override
-  State<SignInOauth> createState() => _SignInOauthState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final supabaseService = SupabaseService();
 
-class _SignInOauthState extends State<SignInOauth> {
-  final SupabaseService supabaseService = SupabaseService();
+    Future<void> googleSignInFunction(BuildContext context) async {
+      ref.read(loadingProvider.notifier).setLoading(true);
 
-  Future<void> _googleSignInFunction(BuildContext context) async {
-    try {
-      bool isSignedIn = await supabaseService.googleSignInFunction();
-      if (isSignedIn) {
-        context.router.replace(const WordListRoute());
-      } else {
+      try {
+        bool isSignedIn = await supabaseService.googleSignInFunction();
+        if (isSignedIn) {
+          context.router.replace(const WordListRoute());
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sign-In failed!')),
+          );
+        }
+      } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sign-In failed!')),
+          SnackBar(content: Text('Error: $error')),
         );
+      } finally {
+        ref.read(loadingProvider.notifier).setLoading(false);
       }
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $error')),
-      );
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center, // Center the buttons
       children: [
         // Google Button
         GestureDetector(
-          onTap: () => _googleSignInFunction(context),
+          onTap: () => googleSignInFunction(context),
           child: CircleAvatar(
             radius: 20, // Adjust the size of the button
             backgroundColor: Colors.white,

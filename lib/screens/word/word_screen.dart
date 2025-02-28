@@ -1,9 +1,10 @@
+import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:supabase_word_app/app_router.dart';
 import 'package:supabase_word_app/components/app_header.dart';
+import 'package:supabase_word_app/constants/constants.dart';
 import 'package:supabase_word_app/providers/user_provider.dart';
 import 'package:supabase_word_app/providers/word_provider.dart';
 
@@ -27,7 +28,7 @@ class WordListScreen extends ConsumerWidget {
             Container(
               height: MediaQuery.of(context).size.height * 0.70,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 1.0),
+                border: Border.all(color: kPrimaryColor, width: 1.0),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: AnimationLimiter(
@@ -48,10 +49,18 @@ class WordListScreen extends ConsumerWidget {
                                 ? IconButton(
                                     icon: const Icon(Icons.delete,
                                         color: Colors.red),
-                                    onPressed: () {
-                                      ref
-                                          .read(wordProvider.notifier)
-                                          .deleteWord(word.id);
+                                    onPressed: () async {
+                                      if (await confirm(
+                                        context,
+                                        title: const Text(
+                                            'Are you sure delete word?'),
+                                        textOK: const Text('Yes'),
+                                        textCancel: const Text('No'),
+                                      )) {
+                                        ref
+                                            .read(wordProvider.notifier)
+                                            .deleteWord(word.id);
+                                      }
                                     },
                                   )
                                 : null,

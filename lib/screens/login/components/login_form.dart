@@ -1,53 +1,47 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_word_app/app_router.dart';
 import 'package:supabase_word_app/components/signin_oauth.dart';
+import 'package:supabase_word_app/providers/loading_provider.dart';
 import 'package:supabase_word_app/utils/validators.dart';
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants/constants.dart';
 import '../../../services/supabase_service.dart';
 
-class LoginForm extends StatefulWidget {
+class LoginForm extends ConsumerWidget {
   const LoginForm({super.key});
 
   @override
-  State<LoginForm> createState() => _LoginFormState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = GlobalKey<FormState>();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final supabaseService = SupabaseService();
 
-class _LoginFormState extends State<LoginForm> {
-  final _formKey = GlobalKey<FormState>(); // Add form key
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final SupabaseService supabaseService = SupabaseService();
+    Future<void> handleLogin(BuildContext context) async {
+      if (formKey.currentState!.validate()) {
+        ref.read(loadingProvider.notifier).setLoading(true);
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
+        try {
+          await supabaseService.login(
+              emailController.text.trim(), passwordController.text.trim());
 
-  Future<void> handleLogin(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      // Validate form
-      try {
-        await supabaseService.login(
-            emailController.text.trim(), passwordController.text.trim());
-
-        context.router.replace(const WordListRoute());
-      } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: $error')),
-        );
+          if (!context.mounted) return;
+          context.router.replace(const WordListRoute());
+        } catch (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: $error')),
+          );
+        } finally {
+          ref.read(loadingProvider.notifier).setLoading(false);
+        }
       }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Column(children: [
       Form(
-        key: _formKey, // Assign key
+        key: formKey, // Assign key
         child: Column(
           children: [
             TextFormField(

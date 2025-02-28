@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  flutter_loading_overlay
   gtk
   url_launcher_linux
 )

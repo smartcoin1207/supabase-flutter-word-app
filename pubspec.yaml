@@ -43,6 +43,10 @@ dependencies:
   auto_route: ^10.0.0
   flutter_staggered_animations: ^1.1.1
   fluttertoast: ^8.2.12
+  loader_overlay: ^5.0.0
+  flutter_loading_overlay: ^1.0.3
+  overlay_loader_with_app_icon: ^0.0.4
+  confirm_dialog: ^1.0.4
 
 dev_dependencies:
   flutter_test:

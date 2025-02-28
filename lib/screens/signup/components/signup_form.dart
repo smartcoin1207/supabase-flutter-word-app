@@ -1,65 +1,58 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_word_app/app_router.dart';
 import 'package:supabase_word_app/components/signin_oauth.dart';
+import 'package:supabase_word_app/providers/loading_provider.dart';
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants/constants.dart';
 import '../../../services/supabase_service.dart';
 
-class SignUpForm extends StatefulWidget {
+class SignUpForm extends ConsumerWidget {
   const SignUpForm({super.key});
 
   @override
-  State<SignUpForm> createState() => _SignUpFormState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = GlobalKey<FormState>(); // Form key
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    final TextEditingController confirmPasswordController =
+        TextEditingController();
+    final SupabaseService supabaseService = SupabaseService();
 
-class _SignUpFormState extends State<SignUpForm> {
-  final _formKey = GlobalKey<FormState>(); // Form key
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-  final SupabaseService supabaseService = SupabaseService();
+    Future<void> handleSignup(BuildContext context) async {
+      if (formKey.currentState!.validate()) {
+        ref.read(loadingProvider.notifier).setLoading(true);
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> handleSignup(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await supabaseService.signUp(
-          emailController.text.trim(),
-          passwordController.text.trim(),
-        );
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Signup successful. Please log in.')),
+        try {
+          await supabaseService.signUp(
+            emailController.text.trim(),
+            passwordController.text.trim(),
           );
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Signup successful.')),
+            );
 
-          // Navigate to Home Screen after successful signup
-          context.router.replace(const WordListRoute());
-        }
-      } catch (error) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Signup failed: $error')),
-          );
+            // Navigate to Home Screen after successful signup
+            context.router.replace(const WordListRoute());
+          }
+        } catch (error) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Signup failed: $error')),
+            );
+          }
+        } finally {
+          ref.read(loadingProvider.notifier).setLoading(false);
         }
       }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Column(
       children: [
         Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             children: [
               TextFormField(
