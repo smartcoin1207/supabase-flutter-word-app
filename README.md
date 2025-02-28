@@ -38,7 +38,11 @@ copy .env.example .env
 
 - Mac & Linux (Terminal)
 ```bash
-cp .env.example .env
+chmod +x setup_config.sh
+```
+
+```
+./setup_config.sh
 ```
 
 In the .env file need to set real thing
@@ -52,19 +56,14 @@ GOOGLE_API_CLIENT_ID_URL_SCHEME=google_ios_client_id_url_scheme
 You should make these from **Supabase Dashbord** and **Google Developer Console**.
 You can refer in "[**Set Up Supabase Api key**](#set-up-supabase-api-key)" and "[**Set Up Google OAuth in the Supabase Dashboard**](#set-up-google-oauth-in-the-supabase-dashboard)"
 
-### 🔹 Read Env file in IOS
-you should run this command to make GenerateEnv.xcconfig in ios
+### 🔹 Make word table in supabase dashboard by manually
+From `supabase/functions/create_words_table.sql`
+- move to **Supabase Dashboard**
+- On the left sidebar, go to **Database** > **SQL Editor**.
+- Click "**New Query**" and enter your SQL commands.
+- Click **RUN**.
 
-Run this command to allow execution:
-```
-chmod +x ios/generate_env.sh
-```
-
-Run the script before building the app
-In ios/Runner.xcodeproj, open Build Phases and add a new Run Script phase:
-```
-./ios/generate_env.sh
-```
+you will see words table in tables list.
 
 ### 🔹 Run Command
 ```
